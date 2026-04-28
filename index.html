@@ -1,12 +1,41 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Lawrence Patel | Tech animal</title>
+    <title>Lawrence . R | Tech animal</title>
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        .gatemaster-link {
+            background: linear-gradient(135deg, #f97316, #f59e0b);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-weight: 700 !important;
+            letter-spacing: 0.5px;
+            position: relative;
+        }
+
+        .gatemaster-link::after {
+            content: '';
+            position: absolute;
+            bottom: -4px;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: linear-gradient(135deg, #f97316, #f59e0b);
+            border-radius: 2px;
+        }
+
+        nav ul li a.gatemaster-link:hover {
+            -webkit-text-fill-color: transparent;
+            opacity: 0.8;
+        }
+    </style>
 </head>
+
 <body>
 
     <div id="loader">
@@ -23,17 +52,19 @@
             <li><a href="#resume">Resume</a></li>
             <li><a href="#updates">Updates</a></li>
             <li><a href="#contact">Contact</a></li>
+            <li><a href="gatemaster.html" class="gatemaster-link" target="_blank"><i class="fas fa-bolt"
+                        style="margin-right:5px;"></i>GATEmaster</a></li>
         </ul>
     </nav>
 
     <header id="home">
         <div class="hero-content">
-            <h1 class="glow-text">Lawrence Patel</h1>
-            <p>Computer Engineering Student @ 
+            <h1 class="glow-text">Lawrence R</h1>
+            <p>Computer Engineering Student @
                 <a href="https://ldrp.ac.in" target="_blank">LDRP-ITR, Gandhinagar, Gujarat</a>
             </p>
             <div class="stats-container">
-                <div class="stat-box"><span>9.20</span> CGPA</div>
+                <div class="stat-box"><span>9.09</span> CGPA</div>
                 <div class="stat-box"><span>Current Semester</span><br> 4th Sem</div>
             </div>
         </div>
@@ -49,13 +80,14 @@
                 <ul>
                     <li>Sem 1 SPI: 9.21</li>
                     <li>Sem 2 SPI: 9.19</li>
+                    <li>sem 3 SPI: 8.88</li>
                 </ul>
             </div>
 
             <div class="resume-card">
                 <h3><i class="fas fa-code"></i> Skills</h3>
                 <div class="skill-tags">
-                    <span>C</span><span>C++</span> <span>Python</span> <span>Java(Ongoing)</span> 
+                    <span>C</span><span>C++</span> <span>Python</span> <span>Java(Ongoing)</span>
                     <span>HTML</span> <span>CSS</span> <span>JavaScript</span> <span>SQL</span>
                     <span>DSA</span> <span>OOPs</span>
                 </div>
@@ -81,6 +113,5 @@
 
     <script src="script.js"></script>
 </body>
+
 </html>
-
-

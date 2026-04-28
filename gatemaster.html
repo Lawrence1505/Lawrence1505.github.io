@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GATEmaster — GATE Exam Progress Tracker</title>
+    <meta name="description" content="GATEmaster helps engineering students track their GATE exam preparation progress, manage study plans, and analyze performance — all in one place.">
+
+    <link rel="stylesheet" href="gatemaster.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Syne:wght@700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+
+    <!-- ========================
+         LOADER
+    ========================= -->
+    <div id="gm-loader">
+        <div class="gm-loader-logo">
+            GATE<span>master</span>
+        </div>
+        <div class="gm-loader-bar">
+            <div class="gm-loader-bar-fill"></div>
+        </div>
+        <p class="gm-loader-text">Loading your prep hub...</p>
+    </div>
+
+    <!-- ========================
+         NAVIGATION
+    ========================= -->
+    <nav id="gm-nav">
+        <a href="gatemaster.html" class="gm-nav-brand" id="gm-logo">
+            <span class="brand-gate">GATE</span><span class="brand-master">master</span>
+            <span class="brand-badge">BETA</span>
+        </a>
+
+        <ul class="gm-nav-links">
+            <li><a href="#gm-features">Features</a></li>
+            <li><a href="#gm-stats">Stats</a></li>
+            <li><a href="#gm-cta">Get Started</a></li>
+            <li>
+                <a href="auth.html" id="gm-signin-btn" style="background:linear-gradient(135deg,#f97316,#f59e0b);color:#000;padding:8px 18px;border-radius:8px;font-weight:700;font-size:0.85rem;text-decoration:none;transition:opacity 0.2s" onmouseover="this.style.opacity='.85'" onmouseout="this.style.opacity='1'">
+                    <i class="fas fa-user" style="margin-right:6px;font-size:0.75rem"></i>Sign In
+                </a>
+            </li>
+            <li>
+                <a href="index.html" class="gm-nav-back" id="gm-back-link">
+                    <i class="fas fa-arrow-left" style="font-size:0.7rem;"></i> Back to TECHANIMAL
+                </a>
+            </li>
+        </ul>
+    </nav>
+
+    <!-- ========================
+         HERO SECTION
+    ========================= -->
+    <section id="gm-hero">
+
+        <div class="gm-hero-eyebrow">
+            <span class="dot"></span>
+            GATEmaster by TECHANIMAL &nbsp;·&nbsp; gatemaster.lawrencepatel.me
+        </div>
+
+        <h1 class="gm-hero-title">
+            <span class="word-gate">GATE</span><br>
+            <span class="word-master">master</span>
+        </h1>
+
+        <p class="gm-hero-subtitle">
+            Your all-in-one GATE exam preparation companion.
+            Track topics, measure progress, and crack the exam — smarter.
+        </p>
+
+        <div class="gm-hero-cta">
+            <a href="#gm-features" class="gm-btn gm-btn-primary" id="gm-explore-btn">
+                <i class="fas fa-bolt"></i> Explore Features
+            </a>
+            <a href="#gm-cta" class="gm-btn gm-btn-secondary" id="gm-notify-btn">
+                <i class="fas fa-bell"></i> Notify Me on Launch
+            </a>
+        </div>
+
+        <div class="gm-scroll-hint">
+            <span>scroll</span>
+            <div class="arrow"></div>
+        </div>
+
+    </section>
+
+    <!-- ========================
+         FEATURES SECTION
+    ========================= -->
+    <section id="gm-features">
+
+        <p class="gm-section-label">What's coming</p>
+        <h2 class="gm-section-title">Everything you need<br>to ace GATE</h2>
+        <p class="gm-section-desc">
+            GATEmaster is being built with one goal — give every aspirant a clear, honest view of where they stand and what's next.
+        </p>
+
+        <div class="gm-feature-grid" id="gm-feature-grid">
+
+            <div class="gm-feature-card" id="gm-card-tracker" onclick="location.href='progress.html'" style="cursor:pointer;">
+                <div class="gm-feature-icon"><i class="fas fa-chart-line"></i></div>
+                <h3>Progress Tracker</h3>
+                <p>
+                    Mark topics as Not Started, In Progress, or Done across all GATE subjects. Visualize your coverage at a glance.
+                </p>
+                <a href="progress.html" class="gm-feature-tag" style="text-decoration:none;">Open Tracker →</a>
+            </div>
+
+            <div class="gm-feature-card" id="gm-card-syllabus" onclick="location.href='syllabus.html'" style="cursor:pointer;">
+                <div class="gm-feature-icon"><i class="fas fa-book-open"></i></div>
+                <h3>Syllabus Manager</h3>
+                <p>
+                    Full GATE CS 2027 syllabus ordered by importance with deep topic breakdowns, tips &amp; exam rules.
+                </p>
+                <a href="syllabus.html" class="gm-feature-tag" style="text-decoration:none;">View Syllabus →</a>
+            </div>
+
+            <div class="gm-feature-card" id="gm-card-mock">
+                <div class="gm-feature-icon"><i class="fas fa-stopwatch"></i></div>
+                <h3>Mock Test Analytics</h3>
+                <p>
+                    Log your mock test scores and see trends over time. Identify weak subjects and focus your revision where it counts.
+                </p>
+                <span class="gm-feature-tag">Coming Soon</span>
+            </div>
+
+            <div class="gm-feature-card" id="gm-card-planner">
+                <div class="gm-feature-icon"><i class="fas fa-calendar-alt"></i></div>
+                <h3>Study Planner</h3>
+                <p>
+                    Set a target date and let GATEmaster build a day-by-day study schedule tailored to your syllabus coverage gaps.
+                </p>
+                <span class="gm-feature-tag">Coming Soon</span>
+            </div>
+
+            <div class="gm-feature-card" id="gm-card-pyq">
+                <div class="gm-feature-icon"><i class="fas fa-layer-group"></i></div>
+                <h3>PYQ Vault</h3>
+                <p>
+                    Access previous year GATE questions organized by year, subject, and difficulty. Practice smart, not hard.
+                </p>
+                <span class="gm-feature-tag">Planned</span>
+            </div>
+
+            <div class="gm-feature-card" id="gm-card-rank">
+                <div class="gm-feature-icon"><i class="fas fa-trophy"></i></div>
+                <h3>Rank Predictor</h3>
+                <p>
+                    Input your mock scores and get an estimated GATE rank and score band prediction based on historical data.
+                </p>
+                <span class="gm-feature-tag">Planned</span>
+            </div>
+
+            <div class="gm-feature-card" id="gm-card-leetcode">
+                <div class="gm-feature-icon"><i class="fas fa-code"></i></div>
+                <h3>LeetCode Ability Tracker</h3>
+                <p>
+                    Connect your LeetCode stats and track your problem-solving growth. Monitor easy/medium/hard counts and streaks alongside your GATE prep.
+                </p>
+                <span class="gm-feature-tag">Planned</span>
+            </div>
+
+        </div>
+    </section>
+
+    <!-- ========================
+         STATS SECTION
+    ========================= -->
+    <section id="gm-stats">
+        <div class="gm-stats-inner">
+
+            <div class="gm-stat-item">
+                <div class="gm-stat-number" id="stat-subjects" data-count="13" data-suffix="">0</div>
+                <div class="gm-stat-label">GATE Subjects Covered</div>
+            </div>
+
+            <div class="gm-stat-item">
+                <div class="gm-stat-number" id="stat-topics" data-count="200" data-suffix="+">0</div>
+                <div class="gm-stat-label">Topics to Track</div>
+            </div>
+
+            <div class="gm-stat-item">
+                <div class="gm-stat-number" id="stat-pyqs" data-count="10" data-suffix="yr">0</div>
+                <div class="gm-stat-label">PYQs in Vault</div>
+            </div>
+
+            <div class="gm-stat-item">
+                <div class="gm-stat-number" id="stat-free" data-count="100" data-suffix="%">0</div>
+                <div class="gm-stat-label">Free to Use</div>
+            </div>
+
+        </div>
+    </section>
+
+    <!-- ========================
+         CTA SECTION
+    ========================= -->
+    <section id="gm-cta">
+        <div class="gm-cta-inner">
+            <h2>Ready to <span>master</span> GATE?</h2>
+            <p>
+                GATEmaster is actively being built. Drop your interest below and be the first to know when it launches.
+            </p>
+            <div style="display:flex; gap:14px; justify-content:center; flex-wrap:wrap;">
+                <a href="mailto:contact@lawrencepatel.me?subject=GATEmaster Interest" class="gm-btn gm-btn-primary" id="gm-cta-btn">
+                    <i class="fas fa-envelope"></i> I'm Interested
+                </a>
+                <a href="index.html" class="gm-btn gm-btn-secondary" id="gm-portfolio-btn">
+                    <i class="fas fa-user"></i> Visit Portfolio
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- ========================
+         FOOTER
+    ========================= -->
+    <footer id="gm-footer">
+        <div class="gm-footer-brand">GATE<span>master</span> <small style="font-family:'Space Grotesk',sans-serif;font-size:0.6rem;color:var(--gm-text-muted);font-weight:400;letter-spacing:1px;">by TECHANIMAL</small></div>
+        <span class="gm-footer-copy">
+            Built by <a href="index.html" class="gm-footer-link">Lawrence R</a> &nbsp;·&nbsp; gatemaster.lawrencepatel.me
+        </span>
+        <a href="index.html" class="gm-footer-link">
+            <i class="fas fa-arrow-left" style="font-size:0.7rem; margin-right:5px;"></i> TECHANIMAL
+        </a>
+    </footer>
+
+    <script src="gatemaster.js"></script>
+</body>
+</html>

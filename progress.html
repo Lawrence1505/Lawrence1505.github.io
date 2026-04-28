@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<script type="module">
+import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
+import { getAuth, onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js';
+const app = initializeApp({apiKey:"AIzaSyCQbf0mX9lAWo2t5HmaKgIz1RCHVoyjX78",authDomain:"gatemaster-17990.firebaseapp.com",projectId:"gatemaster-17990",storageBucket:"gatemaster-17990.firebasestorage.app",messagingSenderId:"931209173996",appId:"1:931209173996:web:f2e3cddad61b6b63fffec9"});
+const auth = getAuth(app);
+onAuthStateChanged(auth, u => {
+  if(!u) { window.location.href='auth.html'; return; }
+  const n = u.displayName || u.email || 'User';
+  document.getElementById('user-name').textContent = 'Hi, ' + n.split(' ')[0] + ' 👋';
+  document.getElementById('user-email').textContent = u.email || '';
+});
+window._signOut = () => signOut(auth).then(() => window.location.href='auth.html');
+</script>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Progress Tracker — GATE CS 2027 | GATEmaster</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Syne:wght@700;800&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#06060f;--surface:#0e0e20;--card:rgba(20,20,45,0.8);--border:rgba(249,115,22,0.2);--bsoft:rgba(255,255,255,0.07);--or:#f97316;--am:#f59e0b;--pu:#7c3aed;--tx:#e2e8f0;--mt:#94a3b8;--glow:rgba(249,115,22,0.25)}
+*{margin:0;padding:0;box-sizing:border-box;scroll-behavior:smooth}
+body{background:var(--bg);color:var(--tx);font-family:'Space Grotesk',sans-serif;min-height:100vh;overflow-x:hidden}
+body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(rgba(249,115,22,0.03) 1px,transparent 1px),linear-gradient(90deg,rgba(249,115,22,0.03) 1px,transparent 1px);background-size:60px 60px;pointer-events:none;z-index:0}
+nav{display:flex;justify-content:space-between;align-items:center;padding:16px 6%;position:fixed;top:0;width:100%;z-index:500;background:rgba(6,6,15,0.92);backdrop-filter:blur(14px);border-bottom:1px solid var(--bsoft)}
+.nb{font-family:'Syne',sans-serif;font-size:1.3rem;font-weight:800;text-decoration:none;color:var(--tx)}
+.nb span{color:var(--or)}
+.nlinks{display:flex;gap:12px}
+.nbtn{font-size:0.78rem;color:var(--mt);border:1px solid var(--bsoft);padding:6px 13px;border-radius:6px;text-decoration:none;transition:all 0.2s}
+.nbtn:hover{border-color:var(--or);color:var(--or)}
+.layout{display:grid;grid-template-columns:280px 1fr;gap:0;min-height:100vh;padding-top:60px;position:relative;z-index:1}
+.sidebar{background:var(--surface);border-right:1px solid var(--bsoft);padding:24px 0;position:sticky;top:60px;height:calc(100vh - 60px);overflow-y:auto}
+.sidebar-title{padding:0 20px 16px;font-family:'Syne',sans-serif;font-size:1rem;font-weight:800;color:var(--tx);border-bottom:1px solid var(--bsoft);margin-bottom:8px}
+.sb-subj{padding:10px 20px;cursor:pointer;display:flex;align-items:center;gap:10px;transition:all 0.2s;border-left:3px solid transparent}
+.sb-subj:hover{background:rgba(249,115,22,0.06);border-left-color:rgba(249,115,22,0.4)}
+.sb-subj.active{background:rgba(249,115,22,0.1);border-left-color:var(--or)}
+.sb-name{font-size:0.83rem;font-weight:600;flex:1;line-height:1.3}
+.sb-mini-bar{height:3px;background:rgba(255,255,255,0.07);border-radius:3px;margin-top:4px;overflow:hidden}
+.sb-mini-fill{height:100%;background:linear-gradient(90deg,var(--or),var(--am));border-radius:3px;transition:width 0.4s ease}
+.sb-pct{font-size:0.68rem;color:var(--mt);min-width:28px;text-align:right}
+.main{padding:32px 40px;overflow-y:auto}
+.overall-bar{background:var(--card);border:1px solid var(--bsoft);border-radius:16px;padding:24px 28px;margin-bottom:32px;backdrop-filter:blur(10px)}
+.ov-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;flex-wrap:wrap;gap:10px}
+.ov-title{font-family:'Syne',sans-serif;font-size:1.2rem;font-weight:800}
+.ov-pct{font-family:'Syne',sans-serif;font-size:2rem;font-weight:800;background:linear-gradient(135deg,var(--or),var(--am));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.ov-barwrap{height:8px;background:rgba(255,255,255,0.07);border-radius:8px;overflow:hidden}
+.ov-barfill{height:100%;background:linear-gradient(90deg,var(--or),var(--am));border-radius:8px;transition:width 0.6s ease;box-shadow:0 0 12px var(--glow)}
+.ov-stats{display:flex;gap:24px;margin-top:12px;flex-wrap:wrap}
+.ov-stat{font-size:0.8rem;color:var(--mt)}
+.ov-stat strong{color:var(--tx)}
+.subject-panel{display:none}
+.subject-panel.active{display:block;animation:fadeIn 0.3s ease}
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.panel-header{margin-bottom:24px}
+.panel-title{font-family:'Syne',sans-serif;font-size:1.8rem;font-weight:800;margin-bottom:8px}
+.panel-meta{display:flex;gap:16px;align-items:center;flex-wrap:wrap}
+.panel-badge{font-size:0.7rem;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;padding:4px 12px;border-radius:20px}
+.bh{background:rgba(249,115,22,0.12);color:var(--or);border:1px solid var(--border)}
+.bm{background:rgba(124,58,237,0.12);color:#a78bfa;border:1px solid rgba(124,58,237,0.3)}
+.bl{background:rgba(100,100,150,0.12);color:var(--mt);border:1px solid rgba(100,100,150,0.2)}
+.panel-prog-row{display:flex;align-items:center;gap:12px}
+.panel-prog-bar{flex:1;height:6px;background:rgba(255,255,255,0.07);border-radius:6px;overflow:hidden}
+.panel-prog-fill{height:100%;background:linear-gradient(90deg,var(--or),var(--am));border-radius:6px;transition:width 0.5s ease}
+.panel-prog-pct{font-family:'Syne',sans-serif;font-size:1rem;font-weight:800;background:linear-gradient(135deg,var(--or),var(--am));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;min-width:44px}
+.topic-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:12px;margin-top:20px}
+.topic-item{background:var(--card);border:1px solid var(--bsoft);border-radius:12px;padding:14px 16px;display:flex;align-items:center;gap:12px;cursor:pointer;transition:all 0.2s;backdrop-filter:blur(6px)}
+.topic-item:hover{border-color:rgba(249,115,22,0.3);background:rgba(249,115,22,0.05)}
+.topic-item.done{border-color:rgba(249,115,22,0.4);background:rgba(249,115,22,0.08)}
+.topic-item.done .topic-name{color:var(--tx)}
+.tc{width:20px;height:20px;border:2px solid var(--bsoft);border-radius:5px;flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:all 0.2s;font-size:0.65rem;color:transparent}
+.topic-item.done .tc{background:linear-gradient(135deg,var(--or),var(--am));border-color:var(--or);color:#000}
+.topic-name{font-size:0.83rem;color:var(--mt);transition:color 0.2s;line-height:1.3}
+.reset-btn{margin-top:24px;padding:10px 22px;background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.25);color:#f87171;border-radius:8px;cursor:pointer;font-family:'Space Grotesk',sans-serif;font-size:0.82rem;font-weight:600;transition:all 0.2s}
+.reset-btn:hover{background:rgba(239,68,68,0.2)}
+@media(max-width:768px){.layout{grid-template-columns:1fr}.sidebar{position:static;height:auto;border-right:none;border-bottom:1px solid var(--bsoft)}.main{padding:20px}}
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="gatemaster.html" class="nb">GATE<span>master</span></a>
+  <div class="nlinks">
+    <span id="user-name" style="font-size:0.8rem;color:var(--mt)"></span>
+    <span id="user-email" style="display:none"></span>
+    <a href="syllabus.html" class="nbtn"><i class="fas fa-book-open" style="margin-right:4px;font-size:0.7rem"></i>Syllabus</a>
+    <button onclick="window._signOut()" class="nbtn" style="cursor:pointer;background:none;border:1px solid rgba(248,113,113,0.25);color:#f87171"><i class="fas fa-sign-out-alt" style="margin-right:4px;font-size:0.7rem"></i>Sign Out</button>
+  </div>
+</nav>
+
+<div class="layout">
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sidebar-title"><i class="fas fa-layer-group" style="color:var(--or);margin-right:8px"></i>Subjects</div>
+    <div id="sidebar-list"></div>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="main">
+    <!-- Overall Progress -->
+    <div class="overall-bar">
+      <div class="ov-top">
+        <div>
+          <div class="ov-title">Overall GATE Progress</div>
+          <div class="ov-stats">
+            <span class="ov-stat"><strong id="done-count">0</strong> done</span>
+            <span class="ov-stat"><strong id="total-count">0</strong> total topics</span>
+            <span class="ov-stat"><strong id="remain-count">0</strong> remaining</span>
+          </div>
+        </div>
+        <div class="ov-pct" id="ov-pct">0%</div>
+      </div>
+      <div class="ov-barwrap"><div class="ov-barfill" id="ov-fill" style="width:0%"></div></div>
+    </div>
+
+    <div id="panels"></div>
+  </main>
+</div>
+
+<script>
+const SUBJECTS = [
+  {id:'algo',name:'Algorithms',badge:'~13–15%',bclass:'bh',topics:['Searching (Binary, Linear)','Sorting (Merge, Quick, Heap)','Hashing & Hash tables','Big-O / Big-Θ / Big-Ω notation','Time complexity analysis','Space complexity analysis','Greedy algorithms','Dynamic programming','Divide and conquer','BFS & DFS graph traversal','Minimum spanning trees (Kruskal, Prim)','Shortest paths (Dijkstra)','Bellman-Ford algorithm','Floyd-Warshall algorithm','Master theorem & recurrences']},
+  {id:'ds',name:'Programming & Data Structures',badge:'~13–14%',bclass:'bh',topics:['Programming in C','Recursion & stack frames','Arrays (1D, 2D)','Stacks','Queues (simple, circular, deque)','Singly linked list','Doubly linked list','Binary trees','Binary Search Trees (BST)','AVL trees','Binary Heaps (min/max)','Graph representation','Tree traversals (in/pre/post/level)','Hashing in DSA']},
+  {id:'os',name:'Operating Systems',badge:'~10–12%',bclass:'bh',topics:['System calls','Process management & PCB','Threads & multithreading','Inter-process communication','Semaphores & mutex','Critical section problem','Deadlock detection','Deadlock prevention','Banker\'s algorithm (avoidance)','CPU scheduling (FCFS, SJF, RR)','Priority scheduling','I/O scheduling (SSTF, SCAN)','Paging & segmentation','Virtual memory','Page replacement (LRU, FIFO, Optimal)','File systems & inodes']},
+  {id:'cn',name:'Computer Networks',badge:'~10–12%',bclass:'bh',topics:['OSI model (7 layers)','TCP/IP model','Packet & circuit switching','Framing & error detection','CRC & checksum','MAC protocols','Ethernet & CSMA/CD','Distance Vector routing','Link State routing (Dijkstra)','IP addressing & classes','Subnetting & CIDR','ARP, RARP, DHCP','ICMP & IGMP','NAT','TCP vs UDP','TCP 3-way handshake','Sliding window & flow control','Congestion control','DNS, HTTP, SMTP, FTP']},
+  {id:'toc',name:'Theory of Computation',badge:'~8–10%',bclass:'bm',topics:['Regular expressions','DFA construction','NFA to DFA conversion','DFA minimization','Context-free grammars (CFG)','Derivations & parse trees','Ambiguous grammars','Push-down automata (PDA)','Pumping lemma for regular languages','Pumping lemma for CFLs','Turing machines','Decidability','Undecidability & Halting problem','Chomsky normal form']},
+  {id:'math',name:'Engineering Mathematics',badge:'~13–15%',bclass:'bm',topics:['Propositional logic','Predicate / first-order logic','Sets, relations & functions','Partial orders & lattices','Monoids & groups','Graph theory (connectivity, matching)','Combinatorics & counting','Recurrence relations','Generating functions','Matrices & determinants','System of linear equations','Eigenvalues & eigenvectors','LU decomposition','Limits & continuity','Differentiation & maxima/minima','Integration','Mean value theorem','Random variables','Discrete distributions (Binomial, Poisson)','Continuous distributions (Normal, Exponential)','Bayes theorem','Conditional probability']},
+  {id:'cd',name:'Compiler Design',badge:'~6–8%',bclass:'bm',topics:['Lexical analysis & tokenization','Regular expressions in lexers','Top-down parsing (LL(1))','Bottom-up parsing (LR, SLR)','LALR & CLR parsing','First & Follow sets','Syntax-directed translation','Runtime environments','Activation records','Intermediate code (3-address)','DAG representation','Local optimisation','Constant propagation','Liveness analysis','Common sub-expression elimination']},
+  {id:'db',name:'Databases',badge:'~6–8%',bclass:'bm',topics:['ER model & ER diagrams','Relational model','Relational algebra','Tuple calculus','SQL DDL & DML','Joins (inner, outer, natural)','Nested queries & subqueries','Functional dependencies','1NF, 2NF, 3NF normalization','BCNF normalization','Candidate & primary keys','B-tree indexing','B+ tree indexing','Transactions & ACID','Serializability','2PL & timestamp concurrency control']},
+  {id:'coa',name:'Computer Organization & Architecture',badge:'~5–7%',bclass:'bl',topics:['Machine instructions','Addressing modes','ALU design','Data-path & control unit','Instruction pipelining','Structural hazards','Data hazards (RAW, WAR, WAW)','Control hazards','Cache memory (direct-mapped)','Fully associative cache','Set-associative cache','Cache replacement (LRU, FIFO)','EMAT calculation','I/O: interrupt driven','DMA mode']},
+  {id:'dl',name:'Digital Logic',badge:'~3–5%',bclass:'bl',topics:['Boolean algebra & identities','Combinational: MUX & demux','Combinational: adders (half, full)','Combinational: encoders & decoders','Sequential: flip-flops (SR, JK, D, T)','Sequential: counters','Sequential: registers','K-map minimization','Quine-McCluskey method','Number representations (2\'s complement, BCD)','Fixed-point arithmetic','Floating-point arithmetic (IEEE 754)']}
+];
+
+const state = JSON.parse(localStorage.getItem('gm_progress') || '{}');
+
+function save(){ localStorage.setItem('gm_progress', JSON.stringify(state)); }
+
+function getSubjDone(s){ return (state[s.id]||[]).length; }
+
+function updateOverall(){
+  let done=0,total=0;
+  SUBJECTS.forEach(s=>{ total+=s.topics.length; done+=getSubjDone(s); });
+  const pct = total?Math.round(done/total*100):0;
+  document.getElementById('done-count').textContent=done;
+  document.getElementById('total-count').textContent=total;
+  document.getElementById('remain-count').textContent=total-done;
+  document.getElementById('ov-pct').textContent=pct+'%';
+  document.getElementById('ov-fill').style.width=pct+'%';
+}
+
+function updateSidebarItem(s){
+  const done=getSubjDone(s), total=s.topics.length, pct=Math.round(done/total*100);
+  const el=document.querySelector(`[data-sid="${s.id}"]`);
+  if(!el) return;
+  el.querySelector('.sb-mini-fill').style.width=pct+'%';
+  el.querySelector('.sb-pct').textContent=pct+'%';
+}
+
+function updatePanelBar(s){
+  const done=getSubjDone(s), total=s.topics.length, pct=Math.round(done/total*100);
+  const fill=document.getElementById('pf-'+s.id);
+  const pctEl=document.getElementById('pp-'+s.id);
+  if(fill) fill.style.width=pct+'%';
+  if(pctEl) pctEl.textContent=pct+'%';
+}
+
+function toggleTopic(sid, topic){
+  if(!state[sid]) state[sid]=[];
+  const idx=state[sid].indexOf(topic);
+  if(idx>=0) state[sid].splice(idx,1);
+  else state[sid].push(topic);
+  save();
+  const s=SUBJECTS.find(x=>x.id===sid);
+  updateSidebarItem(s);
+  updatePanelBar(s);
+  updateOverall();
+  // update item visual
+  const el=document.querySelector(`[data-topic="${sid}:${topic.replace(/"/g,'&quot;')}"]`);
+  if(el) el.classList.toggle('done', state[sid].includes(topic));
+}
+
+function showPanel(id){
+  document.querySelectorAll('.subject-panel').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.sb-subj').forEach(s=>s.classList.remove('active'));
+  document.getElementById('panel-'+id).classList.add('active');
+  document.querySelector(`[data-sid="${id}"]`).classList.add('active');
+}
+
+function buildSidebar(){
+  const list=document.getElementById('sidebar-list');
+  SUBJECTS.forEach(s=>{
+    const done=getSubjDone(s), total=s.topics.length, pct=Math.round(done/total*100);
+    const div=document.createElement('div');
+    div.className='sb-subj';
+    div.setAttribute('data-sid',s.id);
+    div.onclick=()=>showPanel(s.id);
+    div.innerHTML=`<div style="flex:1"><div class="sb-name">${s.name}</div><div class="sb-mini-bar"><div class="sb-mini-fill" style="width:${pct}%"></div></div></div><span class="sb-pct">${pct}%</span>`;
+    list.appendChild(div);
+  });
+}
+
+function buildPanels(){
+  const cont=document.getElementById('panels');
+  SUBJECTS.forEach(s=>{
+    const done=getSubjDone(s), total=s.topics.length, pct=Math.round(done/total*100);
+    const div=document.createElement('div');
+    div.className='subject-panel';
+    div.id='panel-'+s.id;
+    let topicsHTML=s.topics.map(t=>{
+      const isDone=state[s.id]&&state[s.id].includes(t);
+      const key=`${s.id}:${t}`;
+      return `<div class="topic-item${isDone?' done':''}" data-topic="${key}" onclick="toggleTopic('${s.id}',\`${t.replace(/`/g,"'")}\`)">
+        <div class="tc">${isDone?'<i class="fas fa-check"></i>':''}</div>
+        <span class="topic-name">${t}</span>
+      </div>`;
+    }).join('');
+    div.innerHTML=`
+      <div class="panel-header">
+        <div class="panel-title">${s.name}</div>
+        <div class="panel-meta">
+          <span class="panel-badge ${s.bclass}">${s.badge} Weightage</span>
+          <div class="panel-prog-row">
+            <div class="panel-prog-bar"><div class="panel-prog-fill" id="pf-${s.id}" style="width:${pct}%"></div></div>
+            <span class="panel-prog-pct" id="pp-${s.id}">${pct}%</span>
+          </div>
+        </div>
+      </div>
+      <div class="topic-grid">${topicsHTML}</div>
+      <button class="reset-btn" onclick="resetSubject('${s.id}')"><i class="fas fa-undo" style="margin-right:6px"></i>Reset ${s.name}</button>
+    `;
+    cont.appendChild(div);
+  });
+}
+
+function resetSubject(sid){
+  if(!confirm('Reset all topics for this subject?')) return;
+  state[sid]=[];
+  save();
+  const s=SUBJECTS.find(x=>x.id===sid);
+  document.querySelectorAll(`[data-topic^="${sid}:"]`).forEach(el=>el.classList.remove('done'));
+  updateSidebarItem(s);
+  updatePanelBar(s);
+  updateOverall();
+}
+
+buildSidebar();
+buildPanels();
+updateOverall();
+showPanel(SUBJECTS[0].id);
+</script>
+</body>
+</html>
