@@ -92,7 +92,7 @@ input::placeholder{color:rgba(148,163,184,0.45)}
       <label>Phone Number</label>
       <div class="prow">
         <input class="pcode" type="text" id="up-code" value="+91">
-        <div class="iw" style="flex:1"><i class="fas fa-phone ico"></i><input type="tel" id="up-phone" placeholder="9876543210" maxlength="10" required></div>
+        <div class="iw" style="flex:1"><i class="fas fa-phone ico"></i><input type="tel" id="up-phone" placeholder="9876543210" maxlength="13" required oninput="this.value=this.value.replace(/\D/g,'').slice(0,10)"></div>
         <button type="button" class="otp-send" id="otp-btn" onclick="sendOTP()">Send OTP</button>
       </div>
       <div id="otp-section" style="display:none">
@@ -190,23 +190,30 @@ function startTimer(s) {
 }
 
 window.sendOTP = async function() {
-  const phone = document.getElementById('up-phone').value.trim();
-  const code = document.getElementById('up-code').value.trim();
-  if(!/^\d{10}$/.test(phone)) { msg('msg-up','err','Enter a valid 10-digit phone number.'); return; }
+  // Strip everything except digits, remove leading 91 if autofilled
+  let phone = document.getElementById('up-phone').value.replace(/\D/g, '');
+  if(phone.startsWith('91') && phone.length === 12) phone = phone.slice(2);
+  document.getElementById('up-phone').value = phone; // clean up field
+  const code = document.getElementById('up-code').value.trim() || '+91';
+  if(phone.length !== 10) { msg('msg-up','err','Enter your 10-digit number without country code (e.g. 9876543210).'); return; }
   const btn = document.getElementById('otp-btn');
   btn.disabled = true;
   try {
     if(!window._rcv) {
-      window._rcv = new RecaptchaVerifier(auth, 'recaptcha-container', { size: 'invisible' });
+      window._rcv = new RecaptchaVerifier(auth, 'recaptcha-container', {
+        size: 'normal',
+        callback: () => {}
+      });
+      await window._rcv.render();
     }
     confirmResult = await signInWithPhoneNumber(auth, code + phone, window._rcv);
     document.getElementById('otp-section').style.display = 'block';
     document.getElementById('o1').focus();
-    msg('msg-up', 'ok', `OTP sent to ${code}${phone}`);
+    msg('msg-up', 'ok', `OTP sent to ${code}${phone} ✓`);
     startTimer(60);
   } catch(e) {
     btn.disabled = false;
-    msg('msg-up', 'err', e.message || 'Failed to send OTP.');
+    msg('msg-up', 'err', e.message || 'Failed to send OTP. Try again.');
     if(window._rcv) { window._rcv.clear(); window._rcv = null; }
   }
 };
