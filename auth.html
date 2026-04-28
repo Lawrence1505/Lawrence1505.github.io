@@ -439,20 +439,8 @@
             style="background:rgba(255,255,255,0.04);border:1px solid var(--bsoft);border-radius:10px;padding:11px 14px;font-size:0.88rem;color:var(--mt);white-space:nowrap">+91</span>
           <input type="tel" id="up-phone" placeholder="9876543210" style="flex:1;padding-left:14px"
             oninput="this.value=this.value.replace(/[^0-9]/g,'').slice(0,10)" required>
-          <button type="button" class="otp-send" id="otp-btn" onclick="sendOTP()">Send OTP</button>
         </div>
-        <div id="otp-section" style="display:none">
-          <div class="otp-boxes">
-            <input type="text" id="o1" maxlength="1" oninput="on(this,'o2')">
-            <input type="text" id="o2" maxlength="1" oninput="on(this,'o3')" onkeydown="ob(event,this,'o1')">
-            <input type="text" id="o3" maxlength="1" oninput="on(this,'o4')" onkeydown="ob(event,this,'o2')">
-            <input type="text" id="o4" maxlength="1" oninput="on(this,'o5')" onkeydown="ob(event,this,'o3')">
-            <input type="text" id="o5" maxlength="1" oninput="on(this,'o6')" onkeydown="ob(event,this,'o4')">
-            <input type="text" id="o6" maxlength="1" onkeydown="ob(event,this,'o5')">
-          </div>
-          <div class="tmr" id="tmr"></div>
-        </div>
-        <div id="recaptcha-container"></div>
+        <p style="font-size:0.7rem;color:var(--mt);margin-top:5px;">📱 Phone OTP verification coming soon</p>
       </div>
       <div><label>Password</label>
         <div class="iw pwrap"><i class="fas fa-lock ico"></i><input type="password" id="up-pwd"
@@ -474,9 +462,7 @@
     import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
     import {
       getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword,
-      signInWithPhoneNumber, RecaptchaVerifier, GoogleAuthProvider,
-      signInWithPopup, updateProfile, onAuthStateChanged, linkWithCredential,
-      EmailAuthProvider
+      GoogleAuthProvider, signInWithPopup, updateProfile, onAuthStateChanged
     } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js';
 
     const app = initializeApp({
@@ -489,7 +475,6 @@
     });
     const auth = getAuth(app);
     const gProvider = new GoogleAuthProvider();
-    let confirmResult = null, timerInt = null;
 
     // Redirect if already signed in
     onAuthStateChanged(auth, u => { if (u) window.location.href = 'progress.html'; });
@@ -542,64 +527,22 @@
       }, 1000);
     }
 
-    window.sendOTP = async function () {
-      // Get phone, strip everything except digits
-      const raw = document.getElementById('up-phone').value.replace(/[^0-9]/g, '');
-      // If user typed full number with country code (e.g. 919876543210), strip leading 91
-      const phone = (raw.length === 12 && raw.startsWith('91')) ? raw.slice(2) : raw;
-      // Update field with cleaned value
-      document.getElementById('up-phone').value = phone;
-
-      if (phone.length !== 10) {
-        msg('msg-up', 'err', '⚠️ Enter exactly 10 digits (e.g. 9876543210) — no spaces or country code.');
-        return;
-      }
-
-      const fullNumber = '+91' + phone;
-      const btn = document.getElementById('otp-btn');
-      btn.disabled = true;
-      btn.textContent = 'Sending...';
-
-      try {
-        if (!window._rcv) {
-          window._rcv = new RecaptchaVerifier(auth, 'recaptcha-container', {
-            size: 'normal',
-            callback: () => { }
-          });
-          await window._rcv.render();
-        }
-        confirmResult = await signInWithPhoneNumber(auth, fullNumber, window._rcv);
-        document.getElementById('otp-section').style.display = 'block';
-        document.getElementById('o1').focus();
-        msg('msg-up', 'ok', '✅ OTP sent to +91-' + phone);
-        startTimer(60);
-      } catch (e) {
-        btn.disabled = false;
-        btn.textContent = 'Send OTP';
-        msg('msg-up', 'err', '❌ ' + (e.message || 'Failed to send OTP. Try again.'));
-        if (window._rcv) { try { window._rcv.clear(); } catch (_) { } window._rcv = null; }
-      }
-    };
 
     window.doSignUp = async function (e) {
       e.preventDefault();
       const name = document.getElementById('up-name').value.trim();
       const email = document.getElementById('up-email').value.trim();
+      const phone = document.getElementById('up-phone').value.trim();
       const pwd = document.getElementById('up-pwd').value;
-      const otp = getOTP();
-      if (otp.length < 6) { msg('msg-up', 'err', 'Enter the 6-digit OTP first.'); return; }
+      if (phone.length !== 10) { msg('msg-up', 'err', '⚠️ Enter a valid 10-digit phone number.'); return; }
       setLoading('up-btn', true);
       try {
-        // Verify OTP first (phone sign-in)
-        const phoneResult = await confirmResult.confirm(otp);
-        const phoneUser = phoneResult.user;
-        // Link email/password to phone account
-        const emailCred = EmailAuthProvider.credential(email, pwd);
-        await linkWithCredential(phoneUser, emailCred).catch(async () => {
-          // If link fails (email already used), sign in and treat as existing user
-        });
-        await updateProfile(phoneUser, { displayName: name });
-        localStorage.setItem('gm_user', JSON.stringify({ name, email, phone: document.getElementById('up-phone').value }));
+        // Create account with email/password
+        const cred = await createUserWithEmailAndPassword(auth, email, pwd);
+        // Save display name
+        await updateProfile(cred.user, { displayName: name });
+        // Save phone to localStorage (OTP verification coming in future)
+        localStorage.setItem('gm_user', JSON.stringify({ name, email, phone: '+91' + phone }));
         window.location.href = 'progress.html';
       } catch (err) {
         setLoading('up-btn', false);
