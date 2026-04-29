@@ -464,6 +464,9 @@
       getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword,
       GoogleAuthProvider, signInWithPopup, updateProfile, onAuthStateChanged
     } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js';
+    import {
+      getFirestore, doc, getDoc, setDoc, updateDoc, increment, serverTimestamp
+    } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
 
     const app = initializeApp({
       apiKey: "AIzaSyCQbf0mX9lAWo2t5HmaKgIz1RCHVoyjX78",
@@ -475,6 +478,38 @@
     });
     const auth = getAuth(app);
     const gProvider = new GoogleAuthProvider();
+    const db = getFirestore(app);
+
+    // ---- Firestore stat helpers ----
+    const STATS_DOC = () => doc(db, 'stats', 'users');
+    const USER_DOC = (uid) => doc(db, 'registeredUsers', uid);
+
+    async function recordSignUp(uid, name, email) {
+      try {
+        const userSnap = await getDoc(USER_DOC(uid));
+        if (!userSnap.exists()) {
+          // First-time registration — write user record & increment counter
+          await setDoc(USER_DOC(uid), { name, email, registeredAt: serverTimestamp() });
+          const statsSnap = await getDoc(STATS_DOC());
+          if (statsSnap.exists()) {
+            await updateDoc(STATS_DOC(), { signupCount: increment(1) });
+          } else {
+            await setDoc(STATS_DOC(), { signupCount: 1, signinCount: 0 });
+          }
+        }
+      } catch (e) { console.warn('recordSignUp error:', e); }
+    }
+
+    async function recordSignIn() {
+      try {
+        const snap = await getDoc(STATS_DOC());
+        if (snap.exists()) {
+          await updateDoc(STATS_DOC(), { signinCount: increment(1) });
+        } else {
+          await setDoc(STATS_DOC(), { signupCount: 0, signinCount: 1 });
+        }
+      } catch (e) { console.warn('recordSignIn error:', e); }
+    }
 
     // Redirect if already signed in
     onAuthStateChanged(auth, u => { if (u) window.location.href = 'progress.html'; });
@@ -543,6 +578,8 @@
         await updateProfile(cred.user, { displayName: name });
         // Save phone to localStorage (OTP verification coming in future)
         localStorage.setItem('gm_user', JSON.stringify({ name, email, phone: '+91' + phone }));
+        // Track sign-up in Firestore (de-duped by UID)
+        await recordSignUp(cred.user.uid, name, email);
         window.location.href = 'progress.html';
       } catch (err) {
         setLoading('up-btn', false);
@@ -558,6 +595,8 @@
       setLoading('in-btn', true);
       try {
         await signInWithEmailAndPassword(auth, email, pwd);
+        // Track sign-in in Firestore
+        await recordSignIn();
         window.location.href = 'progress.html';
       } catch (err) {
         setLoading('in-btn', false);
@@ -569,7 +608,15 @@
 
     window.doGoogle = async function () {
       try {
-        await signInWithPopup(auth, gProvider);
+        const result = await signInWithPopup(auth, gProvider);
+        const isNew = result._tokenResponse?.isNewUser || false;
+        if (isNew) {
+          // New Google user — count as sign-up
+          await recordSignUp(result.user.uid, result.user.displayName || '', result.user.email || '');
+        } else {
+          // Returning Google user — count as sign-in
+          await recordSignIn();
+        }
         window.location.href = 'progress.html';
       } catch (err) {
         msg('msg-in', 'err', err.message);
