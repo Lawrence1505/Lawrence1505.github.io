@@ -488,26 +488,18 @@
       try {
         const userSnap = await getDoc(USER_DOC(uid));
         if (!userSnap.exists()) {
-          // First-time registration — write user record & increment counter
+          // Write user record (first time only)
           await setDoc(USER_DOC(uid), { name, email, registeredAt: serverTimestamp() });
-          const statsSnap = await getDoc(STATS_DOC());
-          if (statsSnap.exists()) {
-            await updateDoc(STATS_DOC(), { signupCount: increment(1) });
-          } else {
-            await setDoc(STATS_DOC(), { signupCount: 1, signinCount: 0 });
-          }
+          // Merge increment — creates the field if missing, increments if exists
+          await setDoc(STATS_DOC(), { signupCount: increment(1) }, { merge: true });
         }
       } catch (e) { console.warn('recordSignUp error:', e); }
     }
 
     async function recordSignIn() {
       try {
-        const snap = await getDoc(STATS_DOC());
-        if (snap.exists()) {
-          await updateDoc(STATS_DOC(), { signinCount: increment(1) });
-        } else {
-          await setDoc(STATS_DOC(), { signupCount: 0, signinCount: 1 });
-        }
+        // Merge increment — creates the field if missing, increments if exists
+        await setDoc(STATS_DOC(), { signinCount: increment(1) }, { merge: true });
       } catch (e) { console.warn('recordSignIn error:', e); }
     }
 
